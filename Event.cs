@@ -105,12 +105,6 @@ namespace MessagingSystem
 
     public class PlayerDeathEvent : Event
     {
-        public bool NoLife { get; private set; }
-
-        public PlayerDeathEvent(bool noLife)
-        {
-            NoLife = noLife;
-        }
     }
 
     #endregion
@@ -199,12 +193,6 @@ namespace MessagingSystem
 
     public class WaveClearedEvent : Event
     {
-        public bool LastWave { get; private set; }
-
-        public WaveClearedEvent(bool lastWave)
-        {
-            LastWave = lastWave;
-        }
     }
 
     #endregion
