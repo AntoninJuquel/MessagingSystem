@@ -121,6 +121,11 @@ namespace MessagingSystem
         }
     }
 
+    public class WeaponShotEvent : Event
+    {
+        
+    }
+
     #region Entity Events
 
     public class EntityDamagedEvent : Event
