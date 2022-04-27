@@ -123,7 +123,6 @@ namespace MessagingSystem
 
     public class WeaponShotEvent : Event
     {
-        
     }
 
     #region Entity Events
@@ -145,10 +144,12 @@ namespace MessagingSystem
     public class EntityKilledEvent : Event
     {
         public Transform Transform { get; private set; }
+        public bool KillReg;
 
-        public EntityKilledEvent(Transform transform)
+        public EntityKilledEvent(Transform transform, bool killReg = true)
         {
             Transform = transform;
+            KillReg = killReg;
         }
     }
 
@@ -194,10 +195,22 @@ namespace MessagingSystem
 
     public class NewWaveEvent : Event
     {
+        public int Delay { get; set; }
+
+        public NewWaveEvent(int delay)
+        {
+            Delay = delay;
+        }
     }
 
     public class WaveClearedEvent : Event
     {
+        public int WaitTime { get; set; }
+
+        public WaveClearedEvent(int waitTime)
+        {
+            WaitTime = waitTime;
+        }
     }
 
     #endregion
