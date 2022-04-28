@@ -195,11 +195,13 @@ namespace MessagingSystem
 
     public class NewWaveEvent : Event
     {
-        public int Delay { get; set; }
+        public int Delay { get; private set; }
+        public bool LastWave { get; private set; }
 
-        public NewWaveEvent(int delay)
+        public NewWaveEvent(int delay, bool lastWave)
         {
             Delay = delay;
+            LastWave = lastWave;
         }
     }
 
