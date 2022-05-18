@@ -1,6 +1,6 @@
 {
     "name": "MessagingSystem",
-    "rootNamespace": "MessagingSystem",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
