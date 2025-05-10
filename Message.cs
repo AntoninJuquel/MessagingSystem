@@ -1,9 +1,9 @@
 ﻿    namespace MessagingSystem
     {
         /// <summary>
-        /// Base event for all EventManager events.
+        /// Base message for all MessageManager messages.
         /// </summary>
-        public abstract class Event
+        public abstract class Message
         {
         }
     }

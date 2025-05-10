@@ -1,15 +1,27 @@
 # MessagingSystem
 
-Taking advantage of the Observer pattern to decouple code using c# events
+**A lightweight, decoupled messaging/event system for Unity using the Observer pattern and C# generics.**
 
+This system allows components to communicate cleanly without tight coupling. Define strongly-typed event classes, subscribe from anywhere, and fire events globally with no references between systems.
 
-## How to use
+---
 
-### 1. Create a derived class from `Event`
-you can even pass parameters
-```c#
-// Event.cs
+## ✨ Features
 
+* 🔄 Observer pattern implementation via generic C# events
+* 💬 Event classes can carry custom payloads (e.g., `GameObject`, `Vector3`)
+* 🧠 Decouples systems without requiring singletons or direct references
+* 💡 Clean API: `Raise`, `AddListener`, `RemoveListener`
+
+---
+
+## 🛠 How to Use
+
+### 1. Define a Custom Event
+
+Create a new class that inherits from `Event`. You can include any parameters you want.
+
+```csharp
 public class PlayerSpawnEvent : Event
 {
     public GameObject player;
@@ -17,65 +29,101 @@ public class PlayerSpawnEvent : Event
 }
 ```
 
-### 2. Create a method to handle the event where ever you want
-you can create multiple methods in multiple classes to handle the event
+---
 
-```c#
-// ParticlesManager.cs
+### 2. Create Event Handlers
 
-public void OnPlayerSpawn(PlayerSpawnEvent e)
+Any class can listen to an event by creating a method that matches the signature.
+
+```csharp
+public class ParticlesManager : MonoBehaviour
 {
-    Instantiate(spawnParticles, e.position, Quaternion.identity);
+    public void OnPlayerSpawn(PlayerSpawnEvent e)
+    {
+        Instantiate(spawnParticles, e.position, Quaternion.identity);
+    }
 }
 ```
 
-```c#
-// PlayerManager.cs
-
-public void OnPlayerSpawn(PlayerSpawnEvent e)
+```csharp
+public class PlayerManager : MonoBehaviour
 {
-    players.Add(e.player)
+    public List<GameObject> players = new();
+
+    public void OnPlayerSpawn(PlayerSpawnEvent e)
+    {
+        players.Add(e.player);
+    }
 }
 ```
 
-### 3. Subscribe to the event
-don't forget to unsubscribe
-```c#
-// ParticlesManager.cs
+---
 
+### 3. Subscribe and Unsubscribe
+
+Register your handler using the generic `AddListener<T>()` method — and remember to remove it!
+
+```csharp
 private void OnEnable()
 {
     EventManager.Instance.AddListener<PlayerSpawnEvent>(OnPlayerSpawn);
 }
+
 private void OnDisable()
 {
     EventManager.Instance.RemoveListener<PlayerSpawnEvent>(OnPlayerSpawn);
 }
 ```
 
-```c#
-// PlayerManager.cs
+> ⚠️ Avoid memory leaks and unexpected calls by always unsubscribing when the object is disabled or destroyed.
 
-private void OnEnable()
-{
-    EventManager.Instance.AddListener<PlayerSpawnEvent>(OnPlayerSpawn);
-}
-private void OnDisable()
-{
-    EventManager.Instance.RemoveListener<PlayerSpawnEvent>(OnPlayerSpawn);
-}
-```
+---
 
-### 4. Fire the event from any where
-```c#
-// GameManager.cs
+### 4. Raise Events
 
+Fire the event from anywhere — no references required.
+
+```csharp
 private void Start()
 {
-    EventManager.Instance.Raise(new PlayerSpawnEvent()
+    var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+
+    EventManager.Instance.Raise(new PlayerSpawnEvent
     {
-        player = Instantiate(playerPrefab, Vector3.zero, Quaternion.Identity);
-        position = Vector3.zero;
+        player = player,
+        position = Vector3.zero
     });
 }
 ```
+
+---
+
+## 📁 Folder Structure
+
+```
+MessagingSystem/
+├── Event.cs              // Base class for all events
+├── EventManager.cs       // Handles subscriptions and dispatching
+└── README.md
+```
+
+---
+
+## ✅ Benefits
+
+* Modular and testable code structure
+* No direct dependencies between systems
+* Great for handling global systems like:
+
+  * Player spawning
+  * UI updates
+  * Audio triggers
+  * Quest progress
+
+---
+
+## 💡 Tips
+
+* Use `[DisallowMultipleComponent]` on managers to avoid duplicate subscriptions.
+* You can create `StaticEvent<T>` types for global listeners if needed.
+* Avoid `Update()` polling — events are more efficient and cleaner.

@@ -2,34 +2,34 @@ using System.Collections.Generic;
 
 namespace MessagingSystem
 {
-    public class EventManager
+    public class MessageManager
     {
-        public static EventManager Instance
+        public static MessageManager Instance
         {
-            get { return _instance ??= new EventManager(); }
+            get { return _instance ??= new MessageManager(); }
         }
 
-        private static EventManager _instance;
+        private static MessageManager _instance;
 
-        public delegate void EventDelegate<in T>(T e) where T : Event;
+        public delegate void MessageDelegate<in T>(T e) where T : Message;
 
-        private delegate void EventDelegate(Event e);
+        private delegate void MessageDelegate(Message e);
 
         /// <summary>
         /// The actual delegate, there is one delegate per unique event. Each
         /// delegate has multiple invocation list items.
         /// </summary>
-        private readonly Dictionary<System.Type, EventDelegate> _delegates = new Dictionary<System.Type, EventDelegate>();
+        private readonly Dictionary<System.Type, MessageDelegate> _delegates = new Dictionary<System.Type, MessageDelegate>();
 
         /// <summary>
         /// Lookups only, there is one delegate lookup per listener
         /// </summary>
-        private readonly Dictionary<System.Delegate, EventDelegate> _delegateLookup = new Dictionary<System.Delegate, EventDelegate>();
+        private readonly Dictionary<System.Delegate, MessageDelegate> _delegateLookup = new Dictionary<System.Delegate, MessageDelegate>();
 
         /// <summary>
         /// Add the delegate.
         /// </summary>
-        public void AddListener<T>(EventDelegate<T> del) where T : Event
+        public void Subscribe<T>(MessageDelegate<T> del) where T : Message
         {
             if (_delegateLookup.ContainsKey(del))
             {
@@ -38,7 +38,7 @@ namespace MessagingSystem
 
             // Create a new non-generic delegate which calls our generic one.  This
             // is the delegate we actually invoke.
-            void InternalDelegate(Event e) => del((T) e);
+            void InternalDelegate(Message e) => del((T) e);
             _delegateLookup[del] = InternalDelegate;
 
             if (_delegates.TryGetValue(typeof(T), out var tempDel))
@@ -54,7 +54,7 @@ namespace MessagingSystem
         /// <summary>
         /// Remove the delegate. Can be called multiple times on same delegate.
         /// </summary>
-        public void RemoveListener<T>(EventDelegate<T> del) where T : Event
+        public void Unsubscribe<T>(MessageDelegate<T> del) where T : Message
         {
             if (!_delegateLookup.TryGetValue(del, out var internalDelegate)) return;
             if (_delegates.TryGetValue(typeof(T), out var tempDel))
@@ -80,9 +80,9 @@ namespace MessagingSystem
         public int DelegateLookupCount => _delegateLookup.Count;
 
         /// <summary>
-        /// Raise the event to all the listeners
+        /// Send the message to all the listeners
         /// </summary>
-        public void Raise(Event e)
+        public void Send(Message e)
         {
             if (_delegates.TryGetValue(e.GetType(), out var del))
             {
